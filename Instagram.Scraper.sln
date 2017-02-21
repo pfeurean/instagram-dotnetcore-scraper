@@ -1,0 +1,29 @@
+
+Microsoft Visual Studio Solution File, Format Version 15.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Instagram.Scraper", "Instagram.Scraper.csproj", "{DABC2CF1-B03C-44A3-8C20-F00E6E6AB211}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DABC2CF1-B03C-44A3-8C20-F00E6E6AB211}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DABC2CF1-B03C-44A3-8C20-F00E6E6AB211}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DABC2CF1-B03C-44A3-8C20-F00E6E6AB211}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DABC2CF1-B03C-44A3-8C20-F00E6E6AB211}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DABC2CF1-B03C-44A3-8C20-F00E6E6AB211}.Debug|x64.ActiveCfg = Debug|x64
+		{DABC2CF1-B03C-44A3-8C20-F00E6E6AB211}.Debug|x64.Build.0 = Debug|x64
+		{DABC2CF1-B03C-44A3-8C20-F00E6E6AB211}.Debug|x86.ActiveCfg = Debug|x86
+		{DABC2CF1-B03C-44A3-8C20-F00E6E6AB211}.Debug|x86.Build.0 = Debug|x86
+		{DABC2CF1-B03C-44A3-8C20-F00E6E6AB211}.Release|x64.ActiveCfg = Release|x64
+		{DABC2CF1-B03C-44A3-8C20-F00E6E6AB211}.Release|x64.Build.0 = Release|x64
+		{DABC2CF1-B03C-44A3-8C20-F00E6E6AB211}.Release|x86.ActiveCfg = Release|x86
+		{DABC2CF1-B03C-44A3-8C20-F00E6E6AB211}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+EndGlobal
