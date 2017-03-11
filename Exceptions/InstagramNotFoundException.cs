@@ -1,4 +1,4 @@
-namespace Instagram.Scraper
+namespace InstagramScraper
 {
     public class InstagramNotFoundException : System.Exception
     {

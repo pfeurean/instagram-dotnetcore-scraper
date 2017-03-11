@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace Instagram.Scraper
+namespace InstagramScraper
 {
 	public class Media
 	{
@@ -17,10 +17,11 @@ namespace Instagram.Scraper
 		public DateTime createdTime;
 		public string type;
 		public string link;
-		public string imageLowResolutionUrl;
-		public string imageThumbnailUrl;
-		public string imageStandardResolutionUrl;
-		public string imageHighResolutionUrl;
+		//public string imageLowResolutionUrl;
+		//public string imageThumbnailUrl;
+		//public string imageStandardResolutionUrl;
+		//public string imageHighResolutionUrl;
+		public string imageUrl;
 		public string caption;
 		public string captionIsEdited;
 		public string isAd;
@@ -134,7 +135,7 @@ namespace Instagram.Scraper
 				caption = (string)token["caption"],
 				height = (int)token["dimensions"]["height"],
 				width = (int)token["dimensions"]["width"],
-				imageStandardResolutionUrl = (string) token["display_src"],
+				imageUrl = (string) token["display_src"]
 			};
 
 			//var images = getImageUrls((string)token["display_src"]);
@@ -163,19 +164,19 @@ namespace Instagram.Scraper
 			return id;
 		}
 
-		private static Dictionary<string, string> getImageUrls(string imageUrl)
-		{
-			var uri = new Uri(imageUrl);
-			var parts = uri.AbsolutePath.Split('/');
-			var imageName = parts[parts.Length - 1];
-			var urls = new Dictionary<string, string> {
-				{ "thumbnail", $"{Endpoints.INSTAGRAM_CDN_URL}t/s150x150/{imageName}" },
-				{ "low", $"{Endpoints.INSTAGRAM_CDN_URL}t/s320x320/{imageName}" },
-				{ "standard", $"{Endpoints.INSTAGRAM_CDN_URL}t/s640x640/{imageName}"},
-				{ "high", $"{Endpoints.INSTAGRAM_CDN_URL}{imageName}" }
-			};
-			return urls;
-		}
+		//private static Dictionary<string, string> getImageUrls(string imageUrl)
+		//{
+		//	var uri = new Uri(imageUrl);
+		//	var parts = uri.AbsolutePath.Split('/');
+		//	var imageName = parts[parts.Length - 1];
+		//	var urls = new Dictionary<string, string> {
+		//		{ "thumbnail", $"{Endpoints.INSTAGRAM_CDN_URL}t/s150x150/{imageName}" },
+		//		{ "low", $"{Endpoints.INSTAGRAM_CDN_URL}t/s320x320/{imageName}" },
+		//		{ "standard", $"{Endpoints.INSTAGRAM_CDN_URL}t/s640x640/{imageName}"},
+		//		{ "high", $"{Endpoints.INSTAGRAM_CDN_URL}{imageName}" }
+		//	};
+		//	return urls;
+		//}
 
 		public static string getLinkFromId(string id)
 		{

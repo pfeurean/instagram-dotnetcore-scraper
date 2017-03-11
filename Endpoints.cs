@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Instagram.Scraper
+namespace InstagramScraper
 {
 	public static class Endpoints
 	{

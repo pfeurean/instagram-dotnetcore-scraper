@@ -8,38 +8,36 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 
-namespace Instagram.Scraper
+namespace InstagramScraper
 {
-	public static class InstagramScraper
+	public static class Instagram
 	{
 		private const int MAX_COMMENTS_PER_REQUEST = 300;
 		private const string characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		private static HttpClient HttpClient = new System.Net.Http.HttpClient() { Timeout = TimeSpan.FromSeconds(90) };
 
 		public static async Task<Account> getAccount(string userName)
 		{
-			using (var HttpClient = new System.Net.Http.HttpClient())
+			var response = await HttpClient.GetAsync(Endpoints.getAccountJsonLink(userName));
+
+			if (!response.IsSuccessStatusCode)
 			{
-				var response = await HttpClient.GetAsync(Endpoints.getAccountJsonLink(userName));
-
-				if (!response.IsSuccessStatusCode)
-				{
-					if (response.StatusCode == HttpStatusCode.NotFound)
-					{
-						throw new InstagramNotFoundException($"Account with given username {userName} does not exist.");
-					}
-
-					throw new InstagramException($"Response code is {response.StatusCode}. Something went wrong. Please report issue.");
-				}
-
-				var contents = await response.Content.ReadAsStringAsync();
-				var token = JObject.Parse(contents);
-				if (token == null)
+				if (response.StatusCode == HttpStatusCode.NotFound)
 				{
 					throw new InstagramNotFoundException($"Account with given username {userName} does not exist.");
 				}
 
-				return Account.fromAccountPage(token["user"]);
+				throw new InstagramException($"Response code is {response.StatusCode}. Something went wrong. Please report issue.");
 			}
+
+			var contents = await response.Content.ReadAsStringAsync();
+			var token = JObject.Parse(contents);
+			if (token == null)
+			{
+				throw new InstagramNotFoundException($"Account with given username {userName} does not exist.");
+			}
+
+			return Account.fromAccountPage(token["user"]);
 		}
 
 		public static string GenerateRandomString(int length = 10)
@@ -57,29 +55,26 @@ namespace Instagram.Scraper
 		public static async Task<Account> getAccountById(long id)
 		{
 			string contents = string.Empty;
-			using (var HttpClient = new System.Net.Http.HttpClient())
+			var request = new System.Net.Http.HttpRequestMessage(HttpMethod.Post, Endpoints.INSTAGRAM_QUERY_URL);
+			var csrftoken = GenerateRandomString();
+			request.Headers.Add("Cookie", $"csrftoken={csrftoken}");
+			request.Headers.Add("X-Csrftoken", csrftoken);
+			request.Headers.Add("Referer", "https://www.instagram.com/");
+			request.Content = new StringContent($"q={Endpoints.getAccountJsonInfoLinkByAccountId(id)}");
+			request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+			var response = await HttpClient.SendAsync(request);
+			if (!response.IsSuccessStatusCode)
 			{
-				var request = new System.Net.Http.HttpRequestMessage(HttpMethod.Post, Endpoints.INSTAGRAM_QUERY_URL);
-				var csrftoken = GenerateRandomString();
-				request.Headers.Add("Cookie", $"csrftoken={csrftoken}");
-				request.Headers.Add("X-Csrftoken", csrftoken);
-				request.Headers.Add("Referer", "https://www.instagram.com/");
-				request.Content = new StringContent($"q={Endpoints.getAccountJsonInfoLinkByAccountId(id)}");
-				request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-				var response = await HttpClient.SendAsync(request);
-				if (!response.IsSuccessStatusCode)
+				if (response.StatusCode == HttpStatusCode.NotFound)
 				{
-					if (response.StatusCode == HttpStatusCode.NotFound)
-					{
-						throw new InstagramNotFoundException($"Account with given id {id} does not exist.");
-					}
-
-					throw new InstagramException($"Response code is {response.StatusCode}. Something went wrong. Please report issue.");
+					throw new InstagramNotFoundException($"Account with given id {id} does not exist.");
 				}
 
-				contents = await response.Content.ReadAsStringAsync();
+				throw new InstagramException($"Response code is {response.StatusCode}. Something went wrong. Please report issue.");
 			}
+
+			contents = await response.Content.ReadAsStringAsync();
 
 			if (string.IsNullOrWhiteSpace(contents))
 			{
@@ -236,18 +231,15 @@ namespace Instagram.Scraper
 			while (index < count && hasNextPage)
 			{
 				var contents = string.Empty;
-				using (var HttpClient = new System.Net.Http.HttpClient())
+				var requestUrl = Endpoints.getMediasJsonByTagLink(tag.Replace("#", ""), maxID ?? "");
+				var response = await HttpClient.GetAsync(requestUrl);
+
+				if (!response.IsSuccessStatusCode)
 				{
-					var requestUrl = Endpoints.getMediasJsonByTagLink(tag.Replace("#", ""), maxID ?? "");
-					var response = await HttpClient.GetAsync(requestUrl);
-
-					if (!response.IsSuccessStatusCode)
-					{
-						throw new InstagramException($"Response code is {response.StatusCode}. Something went wrong. Please report issue.");
-					}
-
-					contents = await response.Content.ReadAsStringAsync();
+					throw new InstagramException($"Response code is {response.StatusCode}. Something went wrong. Please report issue.");
 				}
+
+				contents = await response.Content.ReadAsStringAsync();
 
 				var token = JObject.Parse(contents);
 				if (token == null)
@@ -289,10 +281,10 @@ namespace Instagram.Scraper
 			}
 
 			var tasks = medias.Select(m => m.ownerId)
-			                  .Distinct()
-			                  .ToArray()
-							  .Select(a => InstagramScraper.getAccountById(a))
-			                  .ToList();
+							  .Distinct()
+							  .ToArray()
+							  .Select(a => Instagram.getAccountById(a))
+							  .ToList();
 
 			var accounts = await Task.WhenAll(tasks);
 
