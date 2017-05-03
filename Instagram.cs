@@ -60,7 +60,9 @@ namespace InstagramScraper
 			request.Headers.Add("Cookie", $"csrftoken={csrftoken}");
 			request.Headers.Add("X-Csrftoken", csrftoken);
 			request.Headers.Add("Referer", "https://www.instagram.com/");
-			request.Content = new StringContent($"q={Endpoints.getAccountJsonInfoLinkByAccountId(id)}");
+            request.Content = new FormUrlEncodedContent(new [] {
+                new System.Collections.Generic.KeyValuePair<string,string>("q", $"{Endpoints.getAccountJsonInfoLinkByAccountId(id)}")
+            });
 			request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
 			var response = await HttpClient.SendAsync(request);
