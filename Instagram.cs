@@ -63,7 +63,6 @@ namespace InstagramScraper
             request.Content = new FormUrlEncodedContent(new [] {
                 new System.Collections.Generic.KeyValuePair<string,string>("q", $"{Endpoints.getAccountJsonInfoLinkByAccountId(id)}")
             });
-			request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
 			var response = await HttpClient.SendAsync(request);
 			if (!response.IsSuccessStatusCode)
