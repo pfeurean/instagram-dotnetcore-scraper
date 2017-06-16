@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
@@ -200,29 +200,30 @@ namespace InstagramScraper
 		// 	return $toReturn;
 		// }
 
-		// public static Media getMediaByCode($mediaCode)
-		// {
-		// 	return self::getMediaByUrl(Endpoints::getMediaPageLink($mediaCode));
-		// }
+        public static async Task<Media> getMediaByCode(string mediaCode)
+		{
+			return await Instagram.getMediaByUrl(Endpoints.getMediaPageLink(mediaCode));
+		}
 
-		// public static Media getMediaByUrl($mediaUrl)
-		// {
-		// 	if (filter_var($mediaUrl, FILTER_VALIDATE_URL) === false) {
-		// 		throw new \InvalidArgumentException('Malformed media url');
-		// 	}
-		// 	$response = Request::get(rtrim($mediaUrl, '/') . '/?__a=1');
-		// 	if ($response->code === 404) {
-		// 		throw new InstagramNotFoundException('Media with given code does not exist or account is private.');
-		// 	}
-		// 	if ($response->code !== 200) {
-		// 		throw new InstagramException('Response code is ' . $response->code . '. Body: ' . $response->body . ' Something went wrong. Please report issue.');
-		// 	}
-		// 	$mediaArray = json_decode($response->raw_body, true);
-		// 	if (!isset($mediaArray['media'])) {
-		// 		throw new InstagramException('Media with this code does not exist');
-		// 	}
-		// 	return Media::fromMediaPage($mediaArray['media']);
-		// }
+        public static async Task<Media> getMediaByUrl(string mediaUrl)
+		{
+			string empty = string.Empty;
+			HttpResponseMessage async = await Instagram.HttpClient.GetAsync(string.Format("{0}/?__a=1", (object)mediaUrl));
+			if (async.StatusCode == HttpStatusCode.NotFound)
+				throw new InstagramNotFoundException("Media with given code does not exist or account is private.");
+			if (!async.IsSuccessStatusCode)
+				throw new InstagramException(string.Format("Response code is {0}. Something went wrong. Please report issue.", (object)async.StatusCode));
+			JObject jobject = JObject.Parse(await async.Content.ReadAsStringAsync());
+			if (jobject == null)
+				throw new InstagramException("Response decoding failed. Returned data corrupted or this library outdated. Please report issue.");
+			string str1 = "graphql";
+            string str2 = "shortcode_media";
+			if (jobject[str1] == null)
+				throw new InstagramException("Media with this code does not exist. Returned data corrupted or this library outdated. Please report issue.");
+			if (jobject[str1][str2] == null)
+				throw new InstagramException("Media with this code does not exist. Returned data corrupted or this library outdated. Please report issue.");
+			return Media.fromMediaPage(jobject[str1][str2]);
+		}
 
 		public static async Task<ICollection<Media>> getMediasByTag(string tag, int count = 12, string maxID = "")
 		{
@@ -281,19 +282,23 @@ namespace InstagramScraper
 				hasNextPage = (bool)token["tag"]["media"]["page_info"]["has_next_page"];
 			}
 
-			var tasks = medias.Select(m => m.ownerId)
-							  .Distinct()
-							  .ToArray()
-							  .Select(a => Instagram.getAccountById(a))
-							  .ToList();
+            foreach (IGrouping<long, Media> grouping in medias.GroupBy<Media, long>((Func<Media, long>)(m => m.ownerId))) //.AsParallel<IGrouping<long, Media>>())
+			{
+				IGrouping<long, Media> a = grouping;
+				long key = a.Key;
+				Media media = a.FirstOrDefault<Media>();
+				if (media != null)
+				{
+					Media mediaByCode = await Instagram.getMediaByCode(media.code);
+                    if (mediaByCode != null && mediaByCode.owner != null)
+                    {
+						a.ToList<Media>().ForEach(b => b.owner = mediaByCode.owner);
+					}
+				}
+				a = (IGrouping<long, Media>)null;
+			}
 
-			var accounts = await Task.WhenAll(tasks);
-
-			(from m in medias
-			 join a in accounts on m.ownerId equals a.id
-			 select new { media = m, account = a }).ToList().ForEach(a => a.media.owner = a.account);
-
-			return medias;
+			return (ICollection<Media>)medias.Where<Media>((Func<Media, bool>)(a => a.owner != null)).ToArray<Media>();
 		}
 
 		// public static function getPaginateMediasByTag($tag, $maxId = '')
