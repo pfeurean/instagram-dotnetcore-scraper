@@ -35,7 +35,7 @@ namespace InstagramScraper
 			return Endpoints.ACCOUNT_JSON_INFO_BY_ID.Replace("{userId}", id.ToString());
 		}
 
-		public static string getAccountMediasJsonLink(string userName, string maxId = null)
+		public static string getAccountMediasJsonLink(string userName, string maxId = @"")
 		{
 			return Endpoints.ACCOUNT_MEDIAS
 							.Replace("{username}", System.Text.Encodings.Web.UrlEncoder.Default.Encode(userName))
