@@ -101,18 +101,18 @@ namespace InstagramScraper
         {
             var media = new Media()
             {
-                code = (string)token["code"],
-                link = Endpoints.getMediaPageLink((string)token["code"]),
-                commentsCount = (int)token["comments"]["count"],
-                likesCount = (int)token["likes"]["count"],
+                code = (string)token["shortcode"],
+                link = Endpoints.getMediaPageLink((string)token["shortcode"]),
+                commentsCount = (int)token["edge_media_to_comment"]["count"],
+                likesCount = (int)token["edge_liked_by"]["count"],
                 ownerId = (long)token["owner"]["id"],
-                createdTime = _epoch.AddSeconds((int)token["date"]),
+                createdTime = _epoch.AddSeconds((int)token["taken_at_timestamp"]),
                 id = (string)token["id"],
                 type = "image",
-                caption = (string)token["caption"],
+                caption = (((JArray)token["edge_media_to_caption"]["edges"]).Count > 0) ? token["edge_media_to_caption"]["edges"][0]["node"]["text"].Value<string>() : "",
                 height = (int)token["dimensions"]["height"],
                 width = (int)token["dimensions"]["width"],
-                imageUrl = (string)token["display_src"]
+                imageUrl = (string)token["display_url"]
             };
 
             //var images = getImageUrls((string)token["display_src"]);
@@ -125,7 +125,7 @@ namespace InstagramScraper
             if ((bool)token["is_video"])
             {
                 media.type = "video";
-                media.videoViews = (int)token["video_views"];
+                media.videoViews = (int)token["video_view_count"];
             }
 
             return media;

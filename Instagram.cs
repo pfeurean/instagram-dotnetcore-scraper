@@ -225,7 +225,7 @@ namespace InstagramScraper
 			return Media.fromMediaPage(jobject[str1][str2]);
 		}
 
-		public static async Task<ICollection<Media>> getMediasByTag(string tag, int count = 12, string maxID = "")
+		public static async Task<ICollection<Media>> getMediasByTag(string tag, int count = 25, string maxID = "")
 		{
 			var index = 0;
 			var medias = new List<Media>();
@@ -249,12 +249,12 @@ namespace InstagramScraper
 					throw new InstagramNotFoundException($"Response decoding failed. Returned data corrupted or this library outdated. Please report issue.");
 				}
 
-				if ((int)token["tag"]["media"]["count"] == 0)
+                if ((int)token["graphql"]["hashtag"]["edge_hashtag_to_media"]["count"] == 0)
 				{
 					return new Media[] { };
 				}
 
-				var nodes = token["tag"]["media"]["nodes"];
+                var nodes = token["graphql"]["hashtag"]["edge_hashtag_to_media"]["edges"];
 				foreach (var mediaArray in nodes)
 				{
 					if (index == count)
@@ -264,7 +264,7 @@ namespace InstagramScraper
 
 					try
 					{
-						medias.Add(Media.fromTagPage(mediaArray));
+						medias.Add(Media.fromTagPage(mediaArray["node"]));
 						index++;
 					}
 					catch (Exception ex)
@@ -278,8 +278,8 @@ namespace InstagramScraper
 					break;
 				}
 
-				maxID = (string)token["tag"]["media"]["page_info"]["end_cursor"];
-				hasNextPage = (bool)token["tag"]["media"]["page_info"]["has_next_page"];
+                maxID = (string)token["graphql"]["hashtag"]["edge_hashtag_to_media"]["page_info"]["end_cursor"];
+                hasNextPage = (bool)token["graphql"]["hashtag"]["edge_hashtag_to_media"]["page_info"]["has_next_page"];
 			}
 
             foreach (IGrouping<long, Media> grouping in medias.GroupBy<Media, long>((Func<Media, long>)(m => m.ownerId))) //.AsParallel<IGrouping<long, Media>>())
