@@ -295,7 +295,6 @@ namespace InstagramScraper
 						a.ToList<Media>().ForEach(b => b.owner = mediaByCode.owner);
 					}
 				}
-				a = (IGrouping<long, Media>)null;
 			}
 
 			return (ICollection<Media>)medias.Where<Media>((Func<Media, bool>)(a => a.owner != null)).ToArray<Media>();
