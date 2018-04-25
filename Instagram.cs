@@ -238,7 +238,7 @@ namespace InstagramScraper
 
 				if (!response.IsSuccessStatusCode)
 				{
-					throw new InstagramException($"Response code is {response.StatusCode}. Something went wrong. Please report issue.");
+					throw new InstagramException(response.StatusCode, $"Response code is {response.StatusCode}. Something went wrong. Please report issue.");
 				}
 
 				contents = await response.Content.ReadAsStringAsync();
