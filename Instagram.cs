@@ -282,7 +282,7 @@ namespace InstagramScraper
                 hasNextPage = (bool)token["graphql"]["hashtag"]["edge_hashtag_to_media"]["page_info"]["has_next_page"];
 			}
 
-            foreach (IGrouping<long, Media> grouping in medias.GroupBy<Media, long>((Func<Media, long>)(m => m.ownerId))) //.AsParallel<IGrouping<long, Media>>())
+            /*foreach (IGrouping<long, Media> grouping in medias.GroupBy<Media, long>((Func<Media, long>)(m => m.ownerId))) //.AsParallel<IGrouping<long, Media>>())
 			{
 				IGrouping<long, Media> a = grouping;
 				long key = a.Key;
@@ -295,9 +295,9 @@ namespace InstagramScraper
 						a.ToList<Media>().ForEach(b => b.owner = mediaByCode.owner);
 					}
 				}
-			}
+			}*/
 
-			return (ICollection<Media>)medias.Where<Media>((Func<Media, bool>)(a => a.owner != null)).ToArray<Media>();
+			return (ICollection<Media>)medias.ToArray<Media>();
 		}
 
 		// public static function getPaginateMediasByTag($tag, $maxId = '')
