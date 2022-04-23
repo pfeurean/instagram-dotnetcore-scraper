@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <ReleaseVersion>1.1-*</ReleaseVersion>
     <Configurations>Debug;Release;Release - WebApplication</Configurations>
   </PropertyGroup>
@@ -12,11 +12,11 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="NuGet.Build.Packaging" Version="0.2.2"></PackageReference>
-		<PackageReference Include="Microsoft.Extensions.WebEncoders" Version="2.2.0">
+		<PackageReference Include="Microsoft.Extensions.WebEncoders" Version="6.0.4">
 		</PackageReference>
-		<PackageReference Include="Newtonsoft.Json" Version="12.0.1">
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1">
 		</PackageReference>
 		<PackageReference Include="System.Linq.Parallel" Version="4.3.0" />
-		<PackageReference Include="System.Text.Encodings.Web" Version="4.5.0" />
+		<PackageReference Include="System.Text.Encodings.Web" Version="6.0.0" />
 	</ItemGroup>
 </Project>
